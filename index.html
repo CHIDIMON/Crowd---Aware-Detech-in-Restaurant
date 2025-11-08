@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คิวร้านอาหาร</title>
+<style>
+  :root{
+    --bg:#ffffff; --paper:#ffffff; --ink:#1f2937; --muted:#6b7280;
+    --ok:#16a34a; --mid:#d97706; --hot:#dc2626;
+    --stroke:#e5e7eb; --radius:16px; --shadow:0 6px 18px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Thai","Sarabun",Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  .app{max-width:480px;margin:0 auto;background:var(--paper);min-height:100%}
+  header{position:sticky;top:0;z-index:10;background:var(--paper);padding:18px 16px 12px;border-bottom:1px solid var(--stroke)}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .brand h1{font-size:22px;margin:0}
+  .search{display:flex;align-items:center;gap:8px;padding:12px 14px;border:1px solid var(--stroke);background:#fafafa;border-radius:14px;color:var(--muted)}
+  .chips{display:flex;gap:10px 12px;padding:12px 16px}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:13px;background:#f7f7f7;border:1px solid var(--stroke);color:var(--ink)}
+  .chip .dot{width:10px;height:10px;border-radius:999px;background:#d1d5db}
+  .chip.ok .dot{background:var(--ok)} .chip.mid .dot{background:var(--mid)} .chip.hot .dot{background:var(--hot)}
+  .divider{height:10px;background:#fafafa;border-top:1px solid var(--stroke);border-bottom:1px solid var(--stroke)}
+  .section{padding:14px 16px}
+  .section h2{font-size:20px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px}
+
+  /* Card */
+  .card{background:var(--paper);border:1px solid var(--stroke);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin:14px 0;text-decoration:none;color:inherit;display:block}
+  .media{position:relative;height:210px;overflow:hidden;background:#f2f2f2}
+  .media img{width:100%;height:100%;object-fit:cover;display:block}
+  .status{position:absolute;right:12px;top:12px;padding:6px 10px;border-radius:999px;font-weight:600;font-size:12px;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+  .status.mid{background:#fff7ed;color:#7c2d12;border-color:#fed7aa}
+  .status.hot{background:#fef2f2;color:#7f1d1d;border-color:#fecaca}
+  .content{padding:14px 14px 10px}
+  .title{font-size:18px;margin:0 0 4px}
+  .meta{color:var(--muted);font-size:13px}
+  .line{height:1px;background:var(--stroke);margin:10px 0}
+  .info{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:600}
+  .left,.right{display:flex;align-items:center;gap:8px;color:#2e2a26}
+  .disabled{opacity:.55;pointer-events:none}
+</style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="brand"><h1>คิวร้านอาหาร</h1></div>
+      <div class="search" role="search" aria-label="ค้นหาร้านอาหาร">
+        <span>ค้นหาร้านอาหาร...</span>
+      </div>
+      <div class="chips" aria-label="ช่วงจำนวนคน">
+        <span class="chip ok"><span class="dot"></span> ว่าง <span style="opacity:.7"></span></span>
+        <span class="chip mid"><span class="dot"></span> ปานกลาง <span style="opacity:.7"></span></span>
+        <span class="chip hot"><span class="dot"></span> แน่น <span style="opacity:.7"></span></span>
+      </div>
+    </header>
+
+    <div class="divider"></div>
+
+    <section class="section">
+      <h2>ร้านอาหารใกล้คุณ</h2>
+      <div class="sub">อัปเดตสถานะล่าสุด · หน้าทดลอง (ข้อมูลจริงเฉพาะร้านแรก)</div>
+
+  <!-- ร้านจริง: พริกขี้หนู Restaurant -->
+      <a class="card" href="#" title="พริกขี้หนู Restaurant">
+        <div class="media">
+          <img src="./RestaurantA.png" alt="พริกขี้หนู Restaurant">
+          <!-- เพิ่ม id ให้ badge สถานะ -->
+          <div class="status" id="status-badge">ว่าง</div>
+        </div>
+        <div class="content">
+          <h3 class="title">พริกขี้หนู Restaurant</h3>
+          <div class="meta">อาหารไทย</div>
+          <div class="line"></div>
+          <div class="info">
+            <!-- เพิ่ม id ให้จำนวนคน -->
+            <div class="right" id="people-count">0 คน</div>
+          </div>
+        </div>
+      </a>
+
+
+      <!-- ร้าน B–E: Coming Soon (ใช้ภาพเดียวกัน) -->
+      <article class="card disabled" aria-disabled="true">
+        <div class="media">
+          <img src="./comingsoon.jpg" alt="Restaurant B - Coming Soon">
+          <div class="status mid">Coming Soon</div>
+        </div>
+        <div class="content">
+          <h3 class="title">Restaurant B</h3>
+          <div class="meta">เตรียมเปิดใช้งาน</div>
+          <div class="line"></div>
+          <div class="info"><div class="left">—</div><div class="right">—</div></div>
+        </div>
+      </article>
+
+      <article class="card disabled" aria-disabled="true">
+        <div class="media">
+          <img src="./comingsoon.jpg" alt="Restaurant C - Coming Soon">
+          <div class="status mid">Coming Soon</div>
+        </div>
+        <div class="content">
+          <h3 class="title">Restaurant C</h3>
+          <div class="meta">เตรียมเปิดใช้งาน</div>
+          <div class="line"></div>
+          <div class="info"><div class="left">—</div><div class="right">—</div></div>
+        </div>
+      </article>
+
+      <article class="card disabled" aria-disabled="true">
+        <div class="media">
+          <img src="./comingsoon.jpg" alt="Restaurant D - Coming Soon">
+          <div class="status mid">Coming Soon</div>
+        </div>
+        <div class="content">
+          <h3 class="title">Restaurant D</h3>
+          <div class="meta">เตรียมเปิดใช้งาน</div>
+          <div class="line"></div>
+          <div class="info"><div class="left">—</div><div class="right">—</div></div>
+        </div>
+      </article>
+
+      <article class="card disabled" aria-disabled="true">
+        <div class="media">
+          <img src="./comingsoon.jpg" alt="Restaurant E - Coming Soon">
+          <div class="status mid">Coming Soon</div>
+        </div>
+        <div class="content">
+          <h3 class="title">Restaurant E</h3>
+          <div class="meta">เตรียมเปิดใช้งาน</div>
+          <div class="line"></div>
+          <div class="info"><div class="left">—</div><div class="right">—</div></div>
+        </div>
+      </article>
+    </section>
+  </main>
+<script>
+  const WS_URL = "ws://localhost:8765";
+
+  function statusFromCount(n) {
+    if (n <= 15) return {text: "ว่าง", cls: "status"};
+    if (n <= 30) return {text: "ปานกลาง", cls: "status mid"};
+    return {text: "แน่น", cls: "status hot"};
+  }
+
+  const badge  = document.getElementById("status-badge");
+  const count  = document.getElementById("people-count");
+  const tsEl   = document.getElementById("last-ts");
+  const phaseEl= document.getElementById("phase");
+
+  // ---- เพิ่ม buffer + throttle 3 วิ ----
+  let latestMsg = null;
+  const EMIT_MS = 500;
+
+  function applyUpdate(msg){
+    const n = Number(msg.count ?? 0);
+    count.textContent = `${n} คน`;
+    const st = statusFromCount(n);
+    badge.textContent = st.text;
+    badge.className = st.cls;
+    tsEl.textContent = msg.ts ?? "--:--";
+    phaseEl.textContent = msg.phase ?? "—";
+  }
+
+  // ทุก 3 วิ อัปเดตครั้งเดียวด้วยค่าล่าสุด
+  setInterval(() => {
+    if (latestMsg) {
+      applyUpdate(latestMsg);
+      latestMsg = null;
+    }
+  }, EMIT_MS);
+
+  function connectWS() {
+    const ws = new WebSocket(WS_URL);
+    ws.onmessage = (ev) => {
+      try { latestMsg = JSON.parse(ev.data); } catch {}
+    };
+    ws.onclose = () => setTimeout(connectWS, 2000);
+  }
+  connectWS();
+</script>
+
+</body>
+</html>
+</body>
+</html>
