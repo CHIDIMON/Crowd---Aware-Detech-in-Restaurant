@@ -3,168 +3,350 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>คิวร้านอาหาร</title>
+<title>Crowd Monitor - คิวร้านอาหาร</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#ffffff; --paper:#ffffff; --ink:#1f2937; --muted:#6b7280;
-    --ok:#16a34a; --mid:#d97706; --hot:#dc2626;
-    --stroke:#e5e7eb; --radius:16px; --shadow:0 6px 18px rgba(0,0,0,.06);
+  :root {
+    --primary: #2563eb;
+    --bg: #f3f4f6;
+    --card-bg: #ffffff;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --radius: 20px;
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Thai","Sarabun",Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
-  .app{max-width:480px;margin:0 auto;background:var(--paper);min-height:100%}
-  header{position:sticky;top:0;z-index:10;background:var(--paper);padding:18px 16px 12px;border-bottom:1px solid var(--stroke)}
-  .brand{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-  .brand h1{font-size:22px;margin:0}
-  .search{display:flex;align-items:center;gap:8px;padding:12px 14px;border:1px solid var(--stroke);background:#fafafa;border-radius:14px;color:var(--muted)}
-  .chips{display:flex;gap:10px 12px;padding:12px 16px}
-  .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:13px;background:#f7f7f7;border:1px solid var(--stroke);color:var(--ink)}
-  .chip .dot{width:10px;height:10px;border-radius:999px;background:#d1d5db}
-  .chip.ok .dot{background:var(--ok)} .chip.mid .dot{background:var(--mid)} .chip.hot .dot{background:var(--hot)}
-  .divider{height:10px;background:#fafafa;border-top:1px solid var(--stroke);border-bottom:1px solid var(--stroke)}
-  .section{padding:14px 16px}
-  .section h2{font-size:20px;margin:0 0 4px}
-  .sub{color:var(--muted);font-size:13px}
 
-  /* Card */
-  .card{background:var(--paper);border:1px solid var(--stroke);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin:14px 0;text-decoration:none;color:inherit;display:block}
-  .media{position:relative;height:210px;overflow:hidden;background:#f2f2f2}
-  .media img{width:100%;height:100%;object-fit:cover;display:block}
-  .status{position:absolute;right:12px;top:12px;padding:6px 10px;border-radius:999px;font-weight:600;font-size:12px;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
-  .status.mid{background:#fff7ed;color:#7c2d12;border-color:#fed7aa}
-  .status.hot{background:#fef2f2;color:#7f1d1d;border-color:#fecaca}
-  .content{padding:14px 14px 10px}
-  .title{font-size:18px;margin:0 0 4px}
-  .meta{color:var(--muted);font-size:13px}
-  .line{height:1px;background:var(--stroke);margin:10px 0}
-  .info{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:600}
-  .left,.right{display:flex;align-items:center;gap:8px;color:#2e2a26}
-  .disabled{opacity:.55;pointer-events:none}
+  body {
+    margin: 0;
+    font-family: 'Kanit', sans-serif;
+    background-color: var(--bg);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    padding-bottom: 80px;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 0 8px;
+  }
+  
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .brand h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-main);
+  }
+
+  .live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--danger);
+    font-weight: 600;
+    background: #fef2f2;
+    padding: 4px 10px;
+    border-radius: 99px;
+    border: 1px solid #fee2e2;
+  }
+
+  .blink {
+    width: 8px;
+    height: 8px;
+    background-color: var(--danger);
+    border-radius: 50%;
+    animation: blinker 1.5s linear infinite;
+  }
+
+  @keyframes blinker {
+    50% { opacity: 0; }
+  }
+
+  /* Main Highlight Card */
+  .main-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-bottom: 30px;
+    transition: transform 0.2s;
+  }
+  
+  @media (min-width: 600px) {
+    .main-card { grid-template-columns: 1.2fr 1fr; }
+  }
+
+  .card-image {
+    position: relative;
+    height: 250px;
+    background: #e5e7eb;
+  }
+  
+  @media (min-width: 600px) {
+    .card-image { height: auto; }
+  }
+
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .status-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-weight: 600;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  /* สี Badge */
+  .status { color: var(--success); border: 2px solid var(--success); }
+  .status.mid { color: var(--warning); border: 2px solid var(--warning); }
+  .status.hot { color: var(--danger); border: 2px solid var(--danger); background: #fff5f5; }
+
+  .card-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .restaurant-name {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+
+  .restaurant-type {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .metric-box {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+  }
+
+  .count-number {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .count-label {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .meta-info {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+  }
+
+  /* Grid for other restaurants */
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-main);
+    padding-left: 8px;
+  }
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  .small-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    opacity: 0.7; /* ทำให้ดูจางๆ เพราะยังไม่เปิด */
+    border: 1px solid #eee;
+  }
+
+  .small-card-img {
+    height: 100px;
+    background: #ddd;
+  }
+  
+  .small-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .small-card-content {
+    padding: 12px;
+  }
+
+  .small-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .coming-soon-badge {
+    display: inline-block;
+    font-size: 10px;
+    background: #f3f4f6;
+    color: var(--text-muted);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-top: 4px;
+  }
+
 </style>
 </head>
 <body>
-  <main class="app">
-    <header>
-      <div class="brand"><h1>คิวร้านอาหาร</h1></div>
-      <div class="search" role="search" aria-label="ค้นหาร้านอาหาร">
-        <span>ค้นหาร้านอาหาร...</span>
+
+<div class="container">
+  <header>
+    <div class="brand">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary)"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
+      <h1>CROWD MONITOR</h1>
+    </div>
+    <div class="live-indicator">
+      <div class="blink"></div> LIVE
+    </div>
+  </header>
+
+  <article class="main-card">
+    <div class="card-image">
+      <img src="./RestaurantA.png" alt="Restaurant A">
+      <div class="status-badge" id="status-badge">รอการเชื่อมต่อ...</div>
+    </div>
+    <div class="card-content">
+      <div>
+        <h2 class="restaurant-name">พริกขี้หนู Restaurant</h2>
+        <div class="restaurant-type">อาหารไทย · เปิดบริการ</div>
       </div>
-      <div class="chips" aria-label="ช่วงจำนวนคน">
-        <span class="chip ok"><span class="dot"></span> ว่าง <span style="opacity:.7"></span></span>
-        <span class="chip mid"><span class="dot"></span> ปานกลาง <span style="opacity:.7"></span></span>
-        <span class="chip hot"><span class="dot"></span> แน่น <span style="opacity:.7"></span></span>
+      
+      <div class="metric-box">
+        <div class="count-number" id="people-count">0</div>
+        <div class="count-label">ลูกค้าในร้าน (คน)</div>
       </div>
-    </header>
 
-    <div class="divider"></div>
+      <div class="meta-info">
+        <div>Phase: <span id="phase">-</span></div>
+        <div>Time: <span id="last-ts">--:--</span></div>
+      </div>
+    </div>
+  </article>
 
-    <section class="section">
-      <h2>ร้านอาหารใกล้คุณ</h2>
-      <div class="sub">อัปเดตสถานะล่าสุด · หน้าทดลอง (ข้อมูลจริงเฉพาะร้านแรก)</div>
+  <div class="section-title">สาขาที่กำลังจะเปิดให้บริการ</div>
+  <div class="grid-container">
+    
+    <div class="small-card">
+      <div class="small-card-img"><img src="./comingsoon.jpg" alt="B"></div>
+      <div class="small-card-content">
+        <h3 class="small-title">Restaurant B</h3>
+        <span class="coming-soon-badge">Coming Soon</span>
+      </div>
+    </div>
 
-  <!-- ร้านจริง: พริกขี้หนู Restaurant -->
-      <a class="card" href="#" title="พริกขี้หนู Restaurant">
-        <div class="media">
-          <img src="./RestaurantA.png" alt="พริกขี้หนู Restaurant">
-          <!-- เพิ่ม id ให้ badge สถานะ -->
-          <div class="status" id="status-badge">ว่าง</div>
-        </div>
-        <div class="content">
-          <h3 class="title">พริกขี้หนู Restaurant</h3>
-          <div class="meta">อาหารไทย</div>
-          <div class="line"></div>
-          <div class="info">
-            <!-- เพิ่ม id ให้จำนวนคน -->
-            <div class="right" id="people-count">0 คน</div>
-          </div>
-        </div>
-      </a>
+    <div class="small-card">
+      <div class="small-card-img"><img src="./comingsoon.jpg" alt="C"></div>
+      <div class="small-card-content">
+        <h3 class="small-title">Restaurant C</h3>
+        <span class="coming-soon-badge">Coming Soon</span>
+      </div>
+    </div>
 
+    <div class="small-card">
+      <div class="small-card-img"><img src="./comingsoon.jpg" alt="D"></div>
+      <div class="small-card-content">
+        <h3 class="small-title">Restaurant D</h3>
+        <span class="coming-soon-badge">Coming Soon</span>
+      </div>
+    </div>
 
-      <!-- ร้าน B–E: Coming Soon (ใช้ภาพเดียวกัน) -->
-      <article class="card disabled" aria-disabled="true">
-        <div class="media">
-          <img src="./comingsoon.jpg" alt="Restaurant B - Coming Soon">
-          <div class="status mid">Coming Soon</div>
-        </div>
-        <div class="content">
-          <h3 class="title">Restaurant B</h3>
-          <div class="meta">เตรียมเปิดใช้งาน</div>
-          <div class="line"></div>
-          <div class="info"><div class="left">—</div><div class="right">—</div></div>
-        </div>
-      </article>
+    <div class="small-card">
+      <div class="small-card-img"><img src="./comingsoon.jpg" alt="E"></div>
+      <div class="small-card-content">
+        <h3 class="small-title">Restaurant E</h3>
+        <span class="coming-soon-badge">Coming Soon</span>
+      </div>
+    </div>
 
-      <article class="card disabled" aria-disabled="true">
-        <div class="media">
-          <img src="./comingsoon.jpg" alt="Restaurant C - Coming Soon">
-          <div class="status mid">Coming Soon</div>
-        </div>
-        <div class="content">
-          <h3 class="title">Restaurant C</h3>
-          <div class="meta">เตรียมเปิดใช้งาน</div>
-          <div class="line"></div>
-          <div class="info"><div class="left">—</div><div class="right">—</div></div>
-        </div>
-      </article>
+  </div>
+</div>
 
-      <article class="card disabled" aria-disabled="true">
-        <div class="media">
-          <img src="./comingsoon.jpg" alt="Restaurant D - Coming Soon">
-          <div class="status mid">Coming Soon</div>
-        </div>
-        <div class="content">
-          <h3 class="title">Restaurant D</h3>
-          <div class="meta">เตรียมเปิดใช้งาน</div>
-          <div class="line"></div>
-          <div class="info"><div class="left">—</div><div class="right">—</div></div>
-        </div>
-      </article>
-
-      <article class="card disabled" aria-disabled="true">
-        <div class="media">
-          <img src="./comingsoon.jpg" alt="Restaurant E - Coming Soon">
-          <div class="status mid">Coming Soon</div>
-        </div>
-        <div class="content">
-          <h3 class="title">Restaurant E</h3>
-          <div class="meta">เตรียมเปิดใช้งาน</div>
-          <div class="line"></div>
-          <div class="info"><div class="left">—</div><div class="right">—</div></div>
-        </div>
-      </article>
-    </section>
-  </main>
 <script>
   const WS_URL = "ws://localhost:8765";
 
+  // ฟังก์ชันเลือกสีและข้อความตามจำนวนคน
   function statusFromCount(n) {
-    if (n <= 15) return {text: "ว่าง", cls: "status"};
-    if (n <= 30) return {text: "ปานกลาง", cls: "status mid"};
-    return {text: "แน่น", cls: "status hot"};
+    if (n <= 15) return {text: "ว่าง (Comfortable)", cls: "status-badge status"};
+    if (n <= 30) return {text: "ปานกลาง (Busy)", cls: "status-badge mid"};
+    return {text: "หนาแน่น (Crowded)", cls: "status-badge hot"};
   }
 
-  const badge  = document.getElementById("status-badge");
-  const count  = document.getElementById("people-count");
-  const tsEl   = document.getElementById("last-ts");
-  const phaseEl= document.getElementById("phase");
+  const badge   = document.getElementById("status-badge");
+  const count   = document.getElementById("people-count");
+  const tsEl    = document.getElementById("last-ts");
+  const phaseEl = document.getElementById("phase");
 
-  // ---- เพิ่ม buffer + throttle 3 วิ ----
   let latestMsg = null;
-  const EMIT_MS = 500;
+  const EMIT_MS = 500; // อัปเดตหน้าจอทุก 0.5 วิ (เพื่อความลื่นไหล)
 
   function applyUpdate(msg){
     const n = Number(msg.count ?? 0);
-    count.textContent = `${n} คน`;
+    
+    // อัปเดตตัวเลข
+    count.textContent = n;
+    
+    // อัปเดตสถานะและสี
     const st = statusFromCount(n);
     badge.textContent = st.text;
-    badge.className = st.cls;
-    tsEl.textContent = msg.ts ?? "--:--";
-    phaseEl.textContent = msg.phase ?? "—";
+    badge.className   = st.cls;
+
+    // อัปเดตข้อมูล Meta (ป้องกัน error ถ้า element หาย แต่ตอนนี้ผมใส่ให้ครบแล้ว)
+    if(tsEl) tsEl.textContent = msg.ts ?? "--:--";
+    if(phaseEl) phaseEl.textContent = msg.phase ?? "—";
   }
 
-  // ทุก 3 วิ อัปเดตครั้งเดียวด้วยค่าล่าสุด
+  // Loop อัปเดต UI แยกจากการรับข้อมูล (Throttle)
   setInterval(() => {
     if (latestMsg) {
       applyUpdate(latestMsg);
@@ -173,16 +355,33 @@
   }, EMIT_MS);
 
   function connectWS() {
+    console.log("Connecting to WS...");
     const ws = new WebSocket(WS_URL);
-    ws.onmessage = (ev) => {
-      try { latestMsg = JSON.parse(ev.data); } catch {}
+    
+    ws.onopen = () => {
+        console.log("Connected");
+        badge.textContent = "เชื่อมต่อแล้ว";
     };
-    ws.onclose = () => setTimeout(connectWS, 2000);
+
+    ws.onmessage = (ev) => {
+      try { 
+        latestMsg = JSON.parse(ev.data); 
+      } catch(e) {
+        console.error("Parse error", e);
+      }
+    };
+    
+    ws.onclose = () => {
+        console.log("Disconnected. Reconnecting...");
+        badge.textContent = "ขาดการเชื่อมต่อ";
+        badge.className = "status-badge"; // สีเทาเดิม
+        setTimeout(connectWS, 2000);
+    };
   }
+  
+  // เริ่มทำงาน
   connectWS();
 </script>
 
-</body>
-</html>
 </body>
 </html>
